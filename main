@@ -5,6 +5,7 @@ namespace scrabble
 {
 	class MainClass
 	{
+	
 		public struct Pion
 		{
 			public char lettre;
@@ -17,6 +18,13 @@ namespace scrabble
 			public int multiplicateurL; //coeff multiplicateur de lettre
 			public int multiplicateurM; //coeff multiplicateur de mot
 			public bool selectionee;
+		}
+
+		public struct Joueur 
+		{
+			public string Nom;
+			public int point;
+			public Case [] Main;
 		}
 
 		public static void initSac(Pion[] sac) {
@@ -411,7 +419,7 @@ namespace scrabble
 		public static void affMain(Case[] main) {
 			int i;
 
-			Console.Write ("\nLa main du joueur est :\n");
+			Console.Write ("\nVotre main est  :\n");
 			for (i = 0; i < 7; i++) {
 				Console.BackgroundColor = ConsoleColor.White;
 				Console.ResetColor ();
@@ -466,32 +474,77 @@ namespace scrabble
 
 		public static void aff(Case[] main, Case[,] grille) {
 			Console.Clear();
+			Console.WriteLine ("---------");
+			Console.WriteLine ("SCRABBLE");
+			Console.WriteLine ("---------");
 			affGrille (grille);
 			affMain (main);
 		}
 
 		public static void jouer(Case[] main, Case[,] grille) {
 
-		
 			while (true) {
 
 				selecGrille (selecMain (main, grille), main, grille);
 			}  
 		}
 
+		public static void initialisationJoueur (int nbJoueur, ref Pion[] sac, ref int pionRestant, Joueur[] tab_joueurs) {
+
+			for (int i = 0; i < nbJoueur; i++) {
+
+				Console.WriteLine ("Nom joueur n° {0}  ?", i+1);
+				tab_joueurs[i].Nom = Console.ReadLine ();
+
+			}
+
+			Console.Write ("\n");
+			Console.WriteLine ("Il y a donc {0} joueurs : ", nbJoueur);
+
+			for (int g = 0; g < nbJoueur; g++) {
+				Console.WriteLine (tab_joueurs[g].Nom); // On affiche pour chaque joueur son nom
+				tab_joueurs [g].point = 0; // Son nombre de points
+				tab_joueurs [g].Main = new Case [7];  // Et on crèe un tableau de char de 7 cases qui contiendra ses lettre tout au cours de la partie 
+				initMain (tab_joueurs [g].Main, sac, ref pionRestant); // On initialise sa main
+
+
+			}
+
+			Console.Write ("\n");
+
+
+
+		}
+
+		/*public static bool finJeux ( ref pionRestant) {
+
+		}
+		*/
 		public static void Main (string[] args)
 		{	
 			Pion[] sac = new Pion[102]; // declaration du sac
 			int pionRestant = 102; //nombre pions restant dans le sac
+			int nbJoueurs = 0; // Nombre de joueurs de la partie
 			Case[,] grille = new Case[15, 15]; //declaration de la gille de jeu
-			Case[] main = new Case[7];
+
 			initSac (sac);
 			initGrille (grille);
-			initMain (main, sac, ref pionRestant);
 
+			do
+			{
+				Console.WriteLine("Combien de joueurs pour cette partie de Scrabble ? :-) ");
 
-			jouer (main, grille);
-	
+			} while (!int.TryParse(Console.ReadLine(), out nbJoueurs));
+
+			Joueur[] tab_joueurs = new Joueur[nbJoueurs];
+			initialisationJoueur (nbJoueurs ,ref sac, ref pionRestant,   tab_joueurs);
+			 
+
+			for (int i = 0; i < nbJoueurs; i++) {
+				jouer (tab_joueurs [i].Main, grille);
+			}
+				//A MODIFIER PLUS TARD 
+
 		}
 
 	}
