@@ -1,11 +1,7 @@
-using System;
-
 namespace scrabble
-
 {
 	class MainClass
 	{
-	
 		public struct Pion
 		{
 			public char lettre;
@@ -24,7 +20,7 @@ namespace scrabble
 		{
 			public string Nom;
 			public int point;
-			public Case [] Main;
+			public Case [] chevalet;
 		}
 
 		public static void initSac(Pion[] sac) {
@@ -363,14 +359,19 @@ namespace scrabble
 
 		}
 
-		public static void selecGrille(Pion pion, Case[] main, Case[,] grille) {
+		public static void selecGrille(Pion pion, Case[] chevalet, Case[,] grille) {
 			ConsoleKeyInfo saisie;
 			int i = 7;
 			int j = 7;
 
+			Case[,] grilleTMP = new Case[15, 15];
+
+		
+
+
 			do {
 				grille [i,j].selectionee = true;
-				aff (main, grille);
+				aff (chevalet, grille);
 				saisie = Console.ReadKey (true);
 				if (saisie.Key == ConsoleKey.UpArrow) {
 					grille[i,j].selectionee = false;
@@ -408,15 +409,15 @@ namespace scrabble
 
 		}
 
-		public static void initMain(Case[] main, Pion[] sac, ref int pionRestant) {
+		public static void initChevalet(Case[] chevalet, Pion[] sac, ref int pionRestant) {
 			int i;
 			for (i = 0; i < 7; i++) {
-				main [i].selectionee = false;
-				main [i].pion = piocher (sac, ref pionRestant);
+				chevalet [i].selectionee = false;
+				chevalet [i].pion = piocher (sac, ref pionRestant);
 			}
 
 		}
-		public static void affMain(Case[] main) {
+		public static void affChevalet(Case[] chevalet) { // ça devrait etre la main temporaire 
 			int i;
 
 			Console.Write ("\nVotre main est  :\n");
@@ -424,14 +425,14 @@ namespace scrabble
 				Console.BackgroundColor = ConsoleColor.White;
 				Console.ResetColor ();
 				Console.Write ("|");
-				if (main [i].selectionee == true) {
+				if (chevalet [i].selectionee == true) {
 					Console.BackgroundColor = ConsoleColor.DarkGray;
 					Console.ForegroundColor = ConsoleColor.White;
 				} else {
 					//Console.BackgroundColor = ConsoleColor.White;
 					Console.ResetColor ();
 				}
-				Console.Write (main [i].pion.lettre);
+				Console.Write (chevalet [i].pion.lettre);
 				//Console.BackgroundColor = ConsoleColor.White;
 				Console.ResetColor ();
 			}
@@ -443,24 +444,33 @@ namespace scrabble
 
 		}
 
-		public static Pion selecMain(Case[] main, Case[,] grille) {
+		public static Pion selecChevalet(Case[] chevalet, Case[,] grille) {
 
 			ConsoleKeyInfo saisie;
 			int i = 0;
 
+
+			Case [] chevaletTMP = new Case [7];
+
+			//On cree un chevalet temporaire
+
+			for (int f = 0; f < 7; f++) {
+				chevaletTMP [f] = chevalet [f];
+			}
+
 			do {
-				main [i].selectionee = true;
-				aff (main, grille);
+				chevalet [i].selectionee = true;
+				aff (chevalet, grille);
 				saisie = Console.ReadKey (true);
 				if (saisie.Key == ConsoleKey.LeftArrow) {
-					main [i].selectionee = false;
+					chevalet [i].selectionee = false;
 					i--;
 					if (i < 0) {
 						i = 0;
 					}
 				}
 				if (saisie.Key == ConsoleKey.RightArrow) {
-					main [i].selectionee = false;
+					chevalet [i].selectionee = false;
 					i++;
 					if (i >= 7) {
 						i = 6;
@@ -468,24 +478,24 @@ namespace scrabble
 				}
 			} while (saisie.Key != ConsoleKey.Enter);
 
-			main [i].selectionee = false;
-			return main [i].pion;
+			chevalet [i].selectionee = false;
+			return chevalet [i].pion;
 		}
 
-		public static void aff(Case[] main, Case[,] grille) {
+		public static void aff(Case[] chevalet, Case[,] grille) {
 			Console.Clear();
 			Console.WriteLine ("---------");
 			Console.WriteLine ("SCRABBLE");
 			Console.WriteLine ("---------");
 			affGrille (grille);
-			affMain (main);
+			affChevalet (chevalet);
 		}
 
-		public static void jouer(Case[] main, Case[,] grille) {
+		public static void jouer(Case[] chevalet, Case[,] grille) {
 
 			while (true) {
 
-				selecGrille (selecMain (main, grille), main, grille);
+				selecGrille (selecChevalet (chevalet, grille), chevalet, grille);
 			}  
 		}
 
@@ -504,8 +514,8 @@ namespace scrabble
 			for (int g = 0; g < nbJoueur; g++) {
 				Console.WriteLine (tab_joueurs[g].Nom); // On affiche pour chaque joueur son nom
 				tab_joueurs [g].point = 0; // Son nombre de points
-				tab_joueurs [g].Main = new Case [7];  // Et on crèe un tableau de char de 7 cases qui contiendra ses lettre tout au cours de la partie 
-				initMain (tab_joueurs [g].Main, sac, ref pionRestant); // On initialise sa main
+				tab_joueurs [g].chevalet = new Case [7];  // Et on crèe un tableau de char de 7 cases qui contiendra ses lettre tout au cours de la partie 
+				initChevalet (tab_joueurs [g].chevalet, sac, ref pionRestant); // On initialise sa main
 
 
 			}
@@ -541,9 +551,9 @@ namespace scrabble
 			 
 
 			for (int i = 0; i < nbJoueurs; i++) {
-				jouer (tab_joueurs [i].Main, grille);
+				jouer (tab_joueurs [i].chevalet, grille);
 			}
-				//A MODIFIER PLUS TARD 
+
 
 		}
 
