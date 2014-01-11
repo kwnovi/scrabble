@@ -14,6 +14,7 @@ namespace scrabble
 			public int multiplicateurL; //coeff multiplicateur de lettre
 			public int multiplicateurM; //coeff multiplicateur de mot
 			public bool selectionee;
+			public bool disponible; 
 		}
 
 		public struct Joueur 
@@ -225,6 +226,7 @@ namespace scrabble
 					grille [i,j].multiplicateurL = 1;
 					grille [i,j].multiplicateurM = 1;
 					grille [i, j].selectionee = false;
+					grille [i, j].disponible = true;
 				}
 			}
 
@@ -338,7 +340,7 @@ namespace scrabble
 						Console.ForegroundColor = ConsoleColor.White;
 						Console.Write (grille [i, j].pion.lettre);
 						Console.ResetColor ();
-					
+
 					}
 					else if (grille [i, j].multiplicateurM == 3) {
 						Console.BackgroundColor = ConsoleColor.Red;
@@ -366,7 +368,7 @@ namespace scrabble
 
 			Case[,] grilleTMP = new Case[15, 15];
 
-		
+
 
 
 			do {
@@ -413,6 +415,7 @@ namespace scrabble
 			int i;
 			for (i = 0; i < 7; i++) {
 				chevalet [i].selectionee = false;
+				chevalet [i].disponible = true;
 				chevalet [i].pion = piocher (sac, ref pionRestant);
 			}
 
@@ -425,17 +428,28 @@ namespace scrabble
 				Console.BackgroundColor = ConsoleColor.White;
 				Console.ResetColor ();
 				Console.Write ("|");
-				if (chevalet [i].selectionee == true) {
-					Console.BackgroundColor = ConsoleColor.DarkGray;
-					Console.ForegroundColor = ConsoleColor.White;
+
+
+				if (chevalet [i].disponible == true) {
+						if (chevalet [i].selectionee == true) {
+							Console.BackgroundColor = ConsoleColor.DarkGray;
+							Console.ForegroundColor = ConsoleColor.White;
+						} else {
+							//Console.BackgroundColor = ConsoleColor.White;
+							Console.ResetColor ();
+						}
+
 				} else {
-					//Console.BackgroundColor = ConsoleColor.White;
-					Console.ResetColor ();
+					Console.BackgroundColor = ConsoleColor.DarkGray;
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+				
 				}
 				Console.Write (chevalet [i].pion.lettre);
+
 				//Console.BackgroundColor = ConsoleColor.White;
 				Console.ResetColor ();
-			}
+
+			} // fin boucle for
 
 			Console.ResetColor ();
 			Console.Write ("|");
@@ -459,26 +473,40 @@ namespace scrabble
 			}
 
 			do {
+
 				chevalet [i].selectionee = true;
+
 				aff (chevalet, grille);
 				saisie = Console.ReadKey (true);
 				if (saisie.Key == ConsoleKey.LeftArrow) {
 					chevalet [i].selectionee = false;
-					i--;
-					if (i < 0) {
-						i = 0;
+
+					if (chevalet [i].disponible) {
+						i--;
+							if (i < 0) {
+								i = 0;
+							}
+		
 					}
+
 				}
 				if (saisie.Key == ConsoleKey.RightArrow) {
 					chevalet [i].selectionee = false;
+
+					if (chevalet [i].disponible) {
 					i++;
-					if (i >= 7) {
-						i = 6;
+						if (i >= 7) {
+							i = 6;
+						}
+
 					}
+				
 				}
 			} while (saisie.Key != ConsoleKey.Enter);
 
+			chevalet [i].disponible = false;
 			chevalet [i].selectionee = false;
+
 			return chevalet [i].pion;
 		}
 
@@ -493,7 +521,7 @@ namespace scrabble
 
 		public static void jouer(Case[] chevalet, Case[,] grille) {
 
-			while (true) {
+			while (true /* Jusqu'a ce le joueur finisse sont tour */) {
 
 				selecGrille (selecChevalet (chevalet, grille), chevalet, grille);
 			}  
@@ -512,6 +540,7 @@ namespace scrabble
 			Console.WriteLine ("Il y a donc {0} joueurs : ", nbJoueur);
 
 			for (int g = 0; g < nbJoueur; g++) {
+
 				Console.WriteLine (tab_joueurs[g].Nom); // On affiche pour chaque joueur son nom
 				tab_joueurs [g].point = 0; // Son nombre de points
 				tab_joueurs [g].chevalet = new Case [7];  // Et on crèe un tableau de char de 7 cases qui contiendra ses lettre tout au cours de la partie 
@@ -526,7 +555,7 @@ namespace scrabble
 
 		}
 
-		/*public static bool finJeux ( ref pionRestant) {
+		/*		public static bool finJeux ( ref pionRestant) {
 
 		}
 		*/
@@ -548,7 +577,7 @@ namespace scrabble
 
 			Joueur[] tab_joueurs = new Joueur[nbJoueurs];
 			initialisationJoueur (nbJoueurs ,ref sac, ref pionRestant,   tab_joueurs);
-			 
+
 
 			for (int i = 0; i < nbJoueurs; i++) {
 				jouer (tab_joueurs [i].chevalet, grille);
