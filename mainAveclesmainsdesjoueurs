@@ -3,6 +3,7 @@ using System;
 
 namespace scrabble
 {
+
 	class MainClass
 	{
 		public struct Pion
@@ -27,6 +28,10 @@ namespace scrabble
 			public Case [] chevalet;
 		}
 
+		/* 
+		 Initialise le sac de jeu (tableau de case), le remplit de lettres avec leurs occurrences
+		 et leurs valeurs puis les mélange pour avoir un tirage pondéré. 
+		*/
 		public static void initSac(Pion[] sac) {
 
 			int i; //indice de boucle
@@ -208,12 +213,14 @@ namespace scrabble
 		}
 
 
-
+		//Pioche un pion dans le sac : prend la dernière valeur du tableau de Case sac
 		public static Pion piocher(Pion[] sac,ref int pionRestant) {
 			pionRestant--;
 			return sac [pionRestant];
 		}
 
+
+		//Initialise la grille en lui attribuant les valeurs spécifiques telles que les multiplicateurs 
 		public static void initGrille(Case[,] grille) {
 			int i,j;
 			Pion pionVide;
@@ -310,6 +317,7 @@ namespace scrabble
 
 		}
 
+		//Affiche la grille 
 		public static void affGrille(Case[,] grille) {
 			int i, j;
 			for (i=0;i<15;i++)
@@ -427,7 +435,7 @@ namespace scrabble
 		public static void affChevalet(Case[] chevalet) { // ça devrait etre la main temporaire 
 			int i;
 
-			Console.Write ("\nVotre main est  :\n");
+			Console.Write ("\n Votre main est  :\n");
 			for (i = 0; i < 7; i++) {
 				Console.BackgroundColor = ConsoleColor.White;
 				Console.ResetColor ();
@@ -439,7 +447,7 @@ namespace scrabble
 							Console.BackgroundColor = ConsoleColor.DarkGray;
 							Console.ForegroundColor = ConsoleColor.White;
 						} else {
-							//Console.BackgroundColor = ConsoleColor.White;
+							
 							Console.ResetColor ();
 						}
 
@@ -456,7 +464,7 @@ namespace scrabble
 
 			Console.ResetColor ();
 			Console.Write ("|");
-			Console.WriteLine ("\n\n Pour terminer ou passer votre tour, appuyer sur Echappe.");
+
 
 
 
@@ -507,8 +515,11 @@ namespace scrabble
 			}
 			} while (saisie.Key != ConsoleKey.Enter);
 
+
 			chevalet [i].disponible = false;
 			chevalet [i].selectionee = false;
+
+
 
 			return chevalet [i].pion;
 		}
@@ -522,16 +533,45 @@ namespace scrabble
 			affChevalet (chevalet);
 		}
 
-		public static void jouer(Case[] chevalet, Case[,] grille, Joueur[] tab_joueurs, int i ) {
+		public static void jouer(Case[,] grille, Joueur[] tab_joueurs, int nbJoueurs) {
 
-			ConsoleKeyInfo cki;
-			Console.TreatControlCAsInput = true;
-			cki = Console.ReadKey();
+			string esc = "";
+
+			bool partieFinie = false; 
+			bool tourFini;
 
 			do {
-				selecGrille (selecChevalet (tab_joueurs [i].chevalet, grille), tab_joueurs [i].chevalet, grille);
-			} while (cki.Key != ConsoleKey.Escape);
-			  
+
+				for (int i = 0; i < nbJoueurs; i++) {
+
+					tourFini = false;
+
+					while (!tourFini) {
+
+						do {
+
+							selecGrille (selecChevalet (tab_joueurs [i].chevalet, grille), tab_joueurs [i].chevalet, grille);
+
+
+							Console.WriteLine ("\n \n "+tab_joueurs[i].Nom +", voulez vous terminer votre tour ? Oui/Non  ");
+							esc = Console.ReadLine ();
+							
+
+						} while (esc != "Oui");
+
+						//tab_joueurs[i].chevalet[i].pion = piocher (sac, ref pionRestant);
+
+						tourFini = true; 
+
+
+					}
+
+				}
+
+			} while (!partieFinie);
+
+			Console.WriteLine ("Fin de la partie.");
+	  
 		}
 
 		public static void initialisationJoueur (int nbJoueur, ref Pion[] sac, ref int pionRestant, Joueur[] tab_joueurs) {
@@ -543,6 +583,7 @@ namespace scrabble
 				tab_joueurs[i].Nom = Console.ReadLine ();
 
 			}
+
 
 			Console.Write ("\n");
 			Console.WriteLine ("Il y a donc {0} joueurs : ", nbJoueur);
@@ -558,9 +599,21 @@ namespace scrabble
 			}
 
 			Console.Write ("\n");
-			Console.WriteLine ("Appuyez sur ENTRER");
+			intro ();
+			Console.WriteLine ("Appuyez sur ENTRER pour commencer à joueur");
 
 
+
+		}
+
+		public static void intro () {
+			Console.WriteLine ("Ce programme est un support de jeu de Scrabble, il est à l'appréciation des joueurs de respecter les règles classiques du jeu.");
+			Console.WriteLine ("Voulez-vous afficher les règles ? Oui/Non ");
+			string res = Console.ReadLine ();
+
+			if (res=="Oui") {
+				Console.WriteLine ("Les règles classiques du Scrabbles sont : ");
+			}
 
 		}
 
@@ -587,10 +640,11 @@ namespace scrabble
 			Joueur[] tab_joueurs = new Joueur[nbJoueurs];
 			initialisationJoueur (nbJoueurs ,ref sac, ref pionRestant,   tab_joueurs);
 
+		
 
-			for (int i = 0; i < nbJoueurs; i++) {
-				jouer (tab_joueurs [i].chevalet, grille, tab_joueurs,  i);
-			}
+
+			jouer (grille, tab_joueurs, nbJoueurs);
+
 
 
 		}
