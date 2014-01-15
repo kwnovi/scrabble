@@ -1,6 +1,5 @@
 using System;
 
-
 namespace scrabble
 {
 	class MainClass
@@ -371,11 +370,11 @@ namespace scrabble
 
 		}
 
-		public static void selecGrille(Pion pion, Case[] chevalet, Case[,] grille, out int Initiali, out int Initialj, ref int cpt) {
+		public static void selecGrille(Pion pion, Case[] chevalet, Case[,] grille, ref int Initiali, ref int Initialj, ref int cpt) {
 			ConsoleKeyInfo saisie;
 			int i = 7;
 			int j = 7;
-			Initiali = Initialj = 0; 
+			 
 
 			//Création de la grille temporaire, le temps de savoir si
 			// le mot est valide ou non, si il est légalement placable sur la grille ou non. 
@@ -428,8 +427,11 @@ namespace scrabble
 					}
 				}
 			} while ((saisie.Key != ConsoleKey.Enter));
+
 			cpt++;
 
+			// Si cpt = 1, ça veut dire que le joueur pose sa première lettre de son tour sur la grille,
+			// on enregistre ses coordonnées (i,j) pour la vérification du mot
 			if (cpt==1) {
 
 				Initiali = i;
@@ -554,8 +556,8 @@ namespace scrabble
 
 			bool partieFinie = false; 
 			bool tourFini;
-			int Initiali = 0;
-			int Initialj = 0;
+
+
 
 			//Création d'un tableau de joueur temporaire (pour avoir un chevalet temporaire) 
 			for (int z = 0; z < nbJoueurs; z++) {
@@ -569,22 +571,25 @@ namespace scrabble
 
 					tourFini = false;
 
-					//Coordonnées (i,j) de la première lettre que le joueur veux poser
-				
-
 
 					do  {
 
-
+						//Coordonnées (i,j) de la première lettre posée par le joueur
+						int Initiali= -1;
+						int  Initialj = -1;
+						//Compteur pour déterminer si la lettre posée par le joueur est la première lettre de tour qu'il pose ou non
 						int cpt = 0;
+
 						do {
 
-							selecGrille (selecChevalet (tab_joueursTMP [i].chevalet, grille), tab_joueursTMP [i].chevalet, grille, out  Initiali, out Initialj, ref cpt);
+							selecGrille (selecChevalet (tab_joueursTMP [i].chevalet, grille), tab_joueursTMP [i].chevalet, grille, ref  Initiali, ref Initialj, ref cpt);
 
 
 							Console.WriteLine ("\n \n "+tab_joueurs[i].Nom +", voulez vous terminer votre tour ? Oui/Non  ");
 							Console.WriteLine (Initiali+", "+Initialj);
 							esc = Console.ReadLine ();
+							// string motCourant;
+							//Ici la fonction pour concatener le mot qu'il est entrain de poser
 							
 
 						} while (esc != "Oui");
@@ -622,6 +627,11 @@ namespace scrabble
 						 
 					}
 
+					//Si fin de parti /!\Fin de partie si aucun joueur n'a de pion dans son chevalet 
+
+					if (pionRestant==0){
+						partieFinie =true;
+					}
 
 
 				}
@@ -629,6 +639,8 @@ namespace scrabble
 			} while (!partieFinie);
 
 			Console.WriteLine ("Fin de la partie.");
+			//Calculer vainqueur
+			Console.WriteLine ("Le grand vainqueur est : ");
 	  
 		}
 
