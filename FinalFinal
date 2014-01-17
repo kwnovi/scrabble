@@ -1,0 +1,1044 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO; // pour lire les fichiers 
+
+
+namespace scrabble
+{
+	class MainClass
+	{
+		public struct Pion
+		{
+			public char lettre;
+			public int valeur;
+		}
+
+		public struct Case
+		{
+			public Pion pion; // le pion posé sur la case
+			public int multiplicateurL; //coeff multiplicateur de lettre
+			public int multiplicateurM; //coeff multiplicateur de mot
+			public bool selectionee;
+			public bool disponible; 
+		}
+
+		public struct Joueur 
+		{
+			public string Nom;
+			public int point;
+			public Case [] chevalet;
+		}
+
+		/* 
+		 Initialise le sac de jeu (tableau de case), le remplit de lettres avec leurs occurrences
+		 et leurs valeurs puis les mélange pour avoir un tirage pondéré. 
+		*/
+		public static void initSac(Pion[] sac) {
+
+			int i; //indice de boucle
+			int iRandom; //indice du sac alétoire
+			Random random = new Random(); //class aléatoire
+			Pion bufferP; //permet d'échanger deux pions
+
+			//initialisation des lettres
+
+			sac[0].lettre='A';
+			sac[1].lettre='A';
+			sac[2].lettre='A';
+			sac[3].lettre='A';
+			sac[4].lettre='A';
+			sac[5].lettre='A';
+			sac[6].lettre='A';
+			sac[7].lettre='A';
+			sac[8].lettre='A';
+
+			sac[9].lettre='B';
+			sac[10].lettre='B';
+
+			sac[11].lettre='C';
+			sac[12].lettre='C';
+
+			sac[13].lettre='D';
+			sac[14].lettre='D';
+			sac[15].lettre='D';
+
+			sac[16].lettre='E';
+			sac[17].lettre='E';
+			sac[18].lettre='E';
+			sac[19].lettre='E';
+			sac[20].lettre='E';
+			sac[21].lettre='E';
+			sac[22].lettre='E';
+			sac[23].lettre='E';
+			sac[24].lettre='E';
+			sac[25].lettre='E';
+			sac[26].lettre='E';
+			sac[27].lettre='E';
+			sac[28].lettre='E';
+			sac[29].lettre='E';
+			sac[30].lettre='E';
+
+			sac[31].lettre='F';
+			sac[32].lettre='F';
+
+			sac[33].lettre='G';
+			sac[34].lettre='G';
+
+			sac[35].lettre='H';
+			sac[36].lettre='H';
+
+			sac[37].lettre='I';
+			sac[38].lettre='I';
+			sac[39].lettre='I';
+			sac[40].lettre='I';
+			sac[41].lettre='I';
+			sac[42].lettre='I';
+			sac[43].lettre='I';
+			sac[44].lettre='I';
+
+			sac[45].lettre='J';
+
+			sac[46].lettre='K';
+
+			sac[47].lettre='L';
+			sac[48].lettre='L';
+			sac[49].lettre='L';
+			sac[50].lettre='L';
+			sac[51].lettre='L';
+
+			sac[52].lettre='M';
+			sac[53].lettre='M';
+			sac[54].lettre='M';
+
+			sac[55].lettre='N';
+			sac[56].lettre='N';
+			sac[57].lettre='N';
+			sac[58].lettre='N';
+			sac[59].lettre='N';
+			sac[60].lettre='N';
+
+			sac[61].lettre='O';
+			sac[62].lettre='O';
+			sac[63].lettre='O';
+			sac[64].lettre='O';
+			sac[65].lettre='O';
+			sac[66].lettre='O';
+
+			sac[67].lettre='P';
+			sac[68].lettre='P';
+
+			sac[69].lettre='Q';
+
+			sac[70].lettre='R';
+			sac[71].lettre='R';
+			sac[72].lettre='R';
+			sac[73].lettre='R';
+			sac[74].lettre='R';
+			sac[75].lettre='R';
+
+			sac[76].lettre='S';
+			sac[77].lettre='S';
+			sac[78].lettre='S';
+			sac[79].lettre='S';
+			sac[80].lettre='S';
+			sac[81].lettre='S';
+
+			sac[82].lettre='T';
+			sac[83].lettre='T';
+			sac[84].lettre='T';
+			sac[85].lettre='T';
+			sac[86].lettre='T';
+			sac[87].lettre='T';
+
+			sac[88].lettre='U';
+			sac[89].lettre='U';
+			sac[90].lettre='U';
+			sac[91].lettre='U';
+			sac[92].lettre='U';
+			sac[93].lettre='U';
+
+			sac[94].lettre='V';
+			sac[95].lettre='V';
+
+			sac[96].lettre='W';
+
+			sac[97].lettre='X';
+
+			sac[98].lettre='Y';
+
+			sac[99].lettre='Z';
+
+			sac[100].lettre='*';
+			sac[101].lettre='*';
+
+			//initialisation des valeurs
+			for (i = 0; i < 102; i++) {
+				if (sac [i].lettre == 'a' || sac [i].lettre == 'e' || sac [i].lettre == 'i' || sac [i].lettre == 'l' || sac [i].lettre == 'n' || sac [i].lettre == 'o' || sac [i].lettre == 'r' || sac [i].lettre == 's' || sac [i].lettre == 't' || sac [i].lettre == 'u') {
+					sac [i].valeur = 1;
+				}
+
+				if (sac [i].lettre == 'd' || sac [i].lettre == 'g' || sac [i].lettre == 'm') {
+					sac [i].valeur = 2;
+				}
+
+				if (sac [i].lettre == 'b' || sac [i].lettre == 'c' || sac [i].lettre == 'p') {
+					sac [i].valeur = 3;
+				}
+
+				if (sac [i].lettre == 'f' || sac [i].lettre == 'h' || sac [i].lettre == 'v') {
+					sac [i].valeur = 4;
+				}
+
+				if (sac [i].lettre == 'j' || sac [i].lettre == 'q') {
+					sac [i].valeur = 8;
+				}
+
+				if (sac [i].lettre == 'k' || sac [i].lettre == 'w' || sac [i].lettre == 'x' || sac [i].lettre == 'y' || sac [i].lettre == 'z') {
+					sac [i].valeur = 10;
+				}
+				if (sac [i].lettre == '*'){
+					sac [i].valeur = 0;
+				}
+			}
+
+			//melange du sac
+			//on echange chaque pion du sac avec un autre pion choisit aléatoirement
+
+			for (i = 0; i < 102; i++) {
+				iRandom = random.Next(0,102);
+				bufferP = sac [i];
+				sac [i] = sac [iRandom];
+				sac [iRandom] = bufferP; 
+			}
+
+		}
+
+
+		//Pioche un pion dans le sac : prend la dernière valeur du tableau de Case sac
+		public static Pion piocher(Pion[] sac,ref int pionRestant) {
+
+			if (pionRestant==0) {
+				Pion pionVide;
+				pionVide.lettre = ' ';
+				pionVide.valeur = 0;
+				return pionVide;
+			} else {
+				pionRestant--;
+				return sac [pionRestant];
+			}
+
+		}
+
+
+		//Initialise la grille en lui attribuant les valeurs spécifiques telles que les multiplicateurs 
+		public static void initGrille(Case[,] grille) {
+			int i,j;
+			Pion pionVide;
+
+			// on initialise a 0 la grille
+
+			pionVide.lettre = ' ';
+			pionVide.valeur = 0;
+			for (i=0;i<15;i++)
+			{
+				for(j=0;j<15;j++) {
+					grille [i,j].pion = pionVide;
+					grille [i,j].multiplicateurL = 1;
+					grille [i,j].multiplicateurM = 1;
+					grille [i, j].selectionee = false;
+					grille [i, j].disponible = true;
+				}
+			}
+
+			// on rajoute les multiplicateurs par 2 de lettre
+
+			grille [0, 3].multiplicateurL = 2;
+			grille [0, 11].multiplicateurL = 2;
+			grille [2, 6].multiplicateurL = 2;
+			grille [2, 8].multiplicateurL = 2;
+			grille [3, 0].multiplicateurL = 2;
+			grille [3, 14].multiplicateurL = 2;
+			grille [3, 7].multiplicateurL = 2;
+			grille [6, 2].multiplicateurL = 2;
+			grille [6, 6].multiplicateurL = 2;
+			grille [6, 8].multiplicateurL = 2;
+			grille [6, 12].multiplicateurL = 2;
+			grille [7, 3].multiplicateurL = 2;
+			grille [7, 11].multiplicateurL = 2;
+
+			grille [8, 2].multiplicateurL = 2;
+			grille [8, 6].multiplicateurL = 2;
+			grille [8, 8].multiplicateurL = 2;
+			grille [8, 12].multiplicateurL = 2;
+			grille [11, 0].multiplicateurL = 2;
+			grille [11, 14].multiplicateurL = 2;
+			grille [11, 7].multiplicateurL = 2;
+			grille [12, 6].multiplicateurL = 2;
+			grille [12, 8].multiplicateurL = 2;
+			grille [14, 3].multiplicateurL = 2;
+			grille [14, 11].multiplicateurL = 2;
+
+			// on rajoute les multiplicateurs par 3 de lettre
+
+			grille [1, 5].multiplicateurL = 3;
+			grille [1, 9].multiplicateurL = 3;
+			grille [5, 1].multiplicateurL = 3;
+			grille [5, 5].multiplicateurL = 3;
+			grille [5, 9].multiplicateurL = 3;
+			grille [5, 13].multiplicateurL = 3;
+			grille [9, 1].multiplicateurL = 3;
+			grille [9, 5].multiplicateurL = 3;
+			grille [9, 9].multiplicateurL = 3;
+			grille [9, 13].multiplicateurL = 3;
+			grille [13, 5].multiplicateurL = 3;
+			grille [13, 9].multiplicateurL = 3;
+
+			// on rajoute les multiplicateurs par 2 de mot
+
+			grille [1, 1].multiplicateurM = 2;
+			grille [1, 13].multiplicateurM = 2;
+			grille [2, 2].multiplicateurM = 2;
+			grille [2, 12].multiplicateurM = 2;
+			grille [3, 3].multiplicateurM = 2;
+			grille [3, 11].multiplicateurM = 2;
+			grille [4, 4].multiplicateurM = 2;
+			grille [4, 10].multiplicateurM = 2;
+			grille [7, 7].multiplicateurM = 2;
+			grille [10, 4].multiplicateurM = 2;
+			grille [10, 10].multiplicateurM = 2;
+			grille [11, 3].multiplicateurM = 2;
+			grille [11, 11].multiplicateurM = 2;
+			grille [12, 2].multiplicateurM = 2;
+			grille [12, 12].multiplicateurM = 2;
+			grille [13, 1].multiplicateurM = 2;
+			grille [13, 13].multiplicateurM = 2;
+
+			// on rajoute les multiplicateurs par 3 de mot
+
+			grille [0, 0].multiplicateurM = 3;
+			grille [0, 7].multiplicateurM = 3;
+			grille [0, 14].multiplicateurM = 3;
+			grille [7, 0].multiplicateurM = 3;
+			grille [7, 14].multiplicateurM = 3;
+			grille [14, 0].multiplicateurM = 3;
+			grille [14, 7].multiplicateurM = 3;
+			grille [14, 14].multiplicateurM = 3;
+
+
+		}
+
+		//Affiche la grille 
+		public static void affGrille(Case[,] grille) {
+			int i, j;
+			for (i=0;i<15;i++)
+			{
+				for (j = 0; j < 15; j++) {
+
+
+					Console.Write ("|");
+					if (grille [i, j].selectionee == true) {
+						Console.BackgroundColor = ConsoleColor.DarkGray;
+						Console.ForegroundColor = ConsoleColor.White;
+						Console.Write (grille [i, j].pion.lettre);
+						Console.ResetColor ();
+					}
+					else if (grille [i, j].multiplicateurL == 2) {
+						Console.BackgroundColor = ConsoleColor.Cyan;
+						Console.ForegroundColor = ConsoleColor.White;
+						Console.Write (grille [i, j].pion.lettre);
+						Console.ResetColor ();
+
+					}
+					else if (grille [i, j].multiplicateurL == 3) {
+						Console.BackgroundColor = ConsoleColor.Blue;
+						Console.ForegroundColor = ConsoleColor.White;
+						Console.Write (grille [i, j].pion.lettre);
+						Console.ResetColor ();
+
+					}
+					else if (grille [i, j].multiplicateurM == 2) {
+						Console.BackgroundColor = ConsoleColor.Magenta;
+						Console.ForegroundColor = ConsoleColor.White;
+						Console.Write (grille [i, j].pion.lettre);
+						Console.ResetColor ();
+
+					}
+					else if (grille [i, j].multiplicateurM == 3) {
+						Console.BackgroundColor = ConsoleColor.Red;
+						Console.ForegroundColor = ConsoleColor.White;
+						Console.Write (grille [i, j].pion.lettre);
+						Console.ResetColor ();
+
+					}
+					else if (grille [i, j].multiplicateurM == 1 && grille [i, j].multiplicateurL == 1) {
+						Console.Write (grille [i, j].pion.lettre);
+					}
+				}
+
+				Console.Write ("|");
+				Console.ResetColor ();
+				Console.Write ("\n");
+			}	
+
+		}
+
+		public static void selecGrille(Pion pion, Case[] chevalet, Case[,] grille, ref int Initiali, ref int Initialj, ref int cpt) {
+			ConsoleKeyInfo saisie;
+			//Placement initial sur la grille
+			int i = 7;
+			int j = 7;
+
+			do {
+				grille [i,j].selectionee = true;
+				aff (chevalet, grille);
+				saisie = Console.ReadKey (true);
+				if (saisie.Key == ConsoleKey.UpArrow) {
+					grille[i,j].selectionee = false;
+					i--;
+					if (i < 0) { // Pour ne pas sortir de la grille 
+						i = 0;
+					}
+
+				}
+				if (saisie.Key == ConsoleKey.DownArrow) {
+					grille[i,j].selectionee = false;
+					i++;
+					if (i >= 15) { // Pour ne pas sortir de la grille 
+						i = 14;
+					}
+				}
+				if (saisie.Key == ConsoleKey.LeftArrow) {
+					grille[i,j].selectionee = false;
+					j--;
+					if (j < 0) { // Pour ne pas sortir de la grille 
+						j = 0;
+					}
+
+				}
+				if (saisie.Key == ConsoleKey.RightArrow) {
+					grille[i,j].selectionee = false;
+					j++;
+					if (j >= 15) { // Pour ne pas sortir de la grille 
+						j = 14;
+					}
+				}
+			} while ((saisie.Key != ConsoleKey.Enter));
+
+			cpt++;
+
+			// Si cpt = 1, ça veut dire que le joueur pose sa première lettre de son tour sur la grille,
+			// on enregistre ses coordonnées (i,j) pour la vérification du mot
+			if (cpt==1) {
+
+				Initiali = i;
+				Initialj = j; 
+
+			}
+
+			grille [i, j].selectionee = false;
+			grille [i, j].disponible = false;
+			grille [i, j].pion = pion; //pion rentré en paramètre au début de la fonction : le pion sur la case est celui rentré en paramètre.
+
+		
+
+		}
+
+		//Initialise le chevalet d'un joueur 
+		public static void initChevalet(Case[] chevalet, Pion[] sac, ref int pionRestant) {
+			int i;
+			for (i = 0; i < 7; i++) {
+				chevalet [i].selectionee = false;
+				chevalet [i].disponible = true;
+				chevalet [i].pion = piocher (sac, ref pionRestant);
+			}
+
+		}
+
+		public static void affChevalet(Case[] chevalet) { 
+			int i;
+
+			Console.Write ("\n Votre main est  :\n");
+			for (i = 0; i < 7; i++) {
+				Console.BackgroundColor = ConsoleColor.White;
+				Console.ResetColor ();
+				Console.Write ("|");
+
+
+				if (chevalet [i].disponible == true) {
+					if (chevalet [i].selectionee == true) {
+							Console.BackgroundColor = ConsoleColor.DarkGray;
+							Console.ForegroundColor = ConsoleColor.White;
+						} else {
+							
+							Console.ResetColor ();
+						}
+
+				} else {
+					Console.BackgroundColor = ConsoleColor.DarkGray;
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+				
+				}
+				Console.Write (chevalet [i].pion.lettre);
+
+				Console.ResetColor ();
+
+			} // fin boucle for
+
+			Console.ResetColor ();
+			Console.Write ("|");
+
+
+
+
+		}
+
+		public static Pion selecChevalet(Case[] chevalet, Case[,] grille) {
+
+			ConsoleKeyInfo saisie;
+			int i = 0;
+
+
+			do {
+
+				chevalet [i].selectionee = true;
+
+				aff (chevalet, grille);
+				saisie = Console.ReadKey (true);
+				if (saisie.Key == ConsoleKey.LeftArrow) {
+
+					chevalet [i].selectionee = false;
+
+						i--;
+
+					if (i < 0) { // Pour ne pas sortir du chevalet 
+							i = 0;
+							}
+
+				}
+				if (saisie.Key == ConsoleKey.RightArrow) {
+
+					chevalet [i].selectionee = false;
+
+						i++;
+
+					if (i >= 7) { // Pour ne pas sortir du chevalet 
+							i = 6;
+						}
+
+			}
+			} while (saisie.Key != ConsoleKey.Enter);
+
+
+			chevalet [i].disponible = false; // Pour griser les cases qui ne sont plus disponibles
+			chevalet [i].selectionee = false;
+
+
+
+
+
+			return chevalet [i].pion;
+		}
+
+		public static void aff(Case[] chevaletTMP, Case[,] grille) {
+
+			Console.Clear();
+			Console.WriteLine ("---------");
+			Console.WriteLine ("SCRABBLE");
+			Console.WriteLine ("---------");
+			affGrille (grille);
+			affChevalet (chevaletTMP);
+
+		}
+
+	
+		// fonction qui calcule le nombre de mots du Dictionnaire parent du  dossier //
+		public static int NbrMotsDictionnaire()
+		{
+			StreamReader monStreamReader = new StreamReader("dico_fr_sans_accent.txt");
+			string mot = monStreamReader.ReadLine();
+			int nbrMot = 0;
+
+			while (mot != null)
+			{
+				nbrMot++;
+				mot = monStreamReader.ReadLine();
+			}
+
+			monStreamReader.Close();
+			return nbrMot;
+
+		}
+
+
+		// fonction qui remplit un tableau contenant tout les mot du fichier texte dictionnaire 
+		public static string[] Initdico (int nbrMot)
+		{
+			StreamReader monStreamReader = new StreamReader("dico_fr_sans_accent.txt");
+			string[] dico = new string[nbrMot];
+
+			for (int i= 0; i < nbrMot; i++)
+			{
+				dico[i] = monStreamReader.ReadLine();
+			}
+
+			return dico;
+
+		}
+
+
+		// fonction qui utilise la methode de chercher par dicothomie pour trouver si le mot rentré en paramètre d'entrée est présent dans le dictionaire //
+		public static bool dicothomie (string[] dico, string motAchercher)
+		{
+
+			int median, imin = 0, imax;
+			bool fin = false;
+
+			imax = dico.Length - 1;
+
+			median = ((imax - imin) / 2 + imin);
+
+			while ((fin == false) || (imin < imax)) 
+			{
+
+				if (motAchercher == dico [median]) 
+				{
+					fin = true;
+					return fin;
+				}
+
+				else if (imin > imax) 
+				{
+					return fin;
+				}
+
+				else if (motAchercher.CompareTo (dico [median]) < 0) 
+				{
+					imax = median - 1;
+
+
+				} 
+
+				else if (motAchercher.CompareTo (dico [median]) > 0) 
+				{
+					imin = median + 1;
+
+				} 
+
+				median = ((imax - imin) / 2) + imin;
+
+			}
+
+			return fin;
+		}
+
+
+		// function qui concataine les lettres posées par le joueur pour construire un mot vérifiable dans le dictionnaire
+		public static string motPose(Case[,] grille, int i, int j, Pion pionVide) 
+		{
+			string constructMot ="";
+
+			//On enregistre les positions de départ
+			int s = i;
+			int r = j;
+
+
+			//On regarde si le mot est disposé horizontalement 
+			if ((grille[i,j+1].pion.lettre!=pionVide.lettre)||(grille[i,j-1].pion.lettre!=pionVide.lettre)) {
+
+
+				if ((grille[i,j+1].pion.lettre !=pionVide.lettre)&&(grille[i,j-1].pion.lettre !=pionVide.lettre)) {
+
+					constructMot += grille [i, j].pion.lettre;
+
+					do {
+						constructMot += grille[i,j+1].pion.lettre;
+						j++;
+					} while (grille[i,j+1].pion.lettre!=pionVide.lettre);
+
+					do {
+						constructMot = grille[i,r-1].pion.lettre + constructMot;
+						r--;
+					} while (grille[i,r-1].pion.lettre!=pionVide.lettre);
+
+					Console.WriteLine ("---------------------------------------------------");
+					Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+					Console.WriteLine ("---------------------------------------------------");
+					Console.ReadLine ();
+					return constructMot;
+
+				}
+				if (((grille[i,j+1].pion.lettre !=pionVide.lettre)&&(!(grille[i,j-1].pion.lettre !=pionVide.lettre)))) {
+
+					constructMot += grille [i, j].pion.lettre;
+
+					do {
+						constructMot += grille[i,j+1].pion.lettre;
+						j++;
+					} while (grille[i,j+1].pion.lettre!=pionVide.lettre);
+
+					Console.WriteLine ("---------------------------------------------------");
+					Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+					Console.WriteLine ("---------------------------------------------------");
+					Console.ReadLine ();
+					return constructMot;
+
+				}
+
+				if (((!(grille [i, j + 1].pion.lettre != pionVide.lettre)) && (grille [i, j - 1].pion.lettre != pionVide.lettre))) {
+
+					constructMot += grille [i, j].pion.lettre;
+					do {
+						constructMot = grille[i,r-1].pion.lettre + constructMot;
+						r--;
+					} while (grille[i,r-1].pion.lettre!=pionVide.lettre);
+
+					Console.WriteLine ("---------------------------------------------------");
+					Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+					Console.WriteLine ("---------------------------------------------------");
+					Console.ReadLine ();
+					return constructMot;
+
+
+				}
+				return constructMot;
+
+
+			}
+
+
+
+			//On regarde si le mot est disposé verticalement 
+			if ((grille[i+1,j].pion.lettre!=pionVide.lettre)||(grille[i-1,j].pion.lettre!=pionVide.lettre)) {
+
+				if ((grille[i+1,j].pion.lettre !=pionVide.lettre)&&(grille[i-1,j].pion.lettre !=pionVide.lettre)) {
+
+					constructMot += grille [i, j].pion.lettre;
+
+					do {
+						constructMot += grille[i+1,j].pion.lettre;
+						i++;
+					} while (grille[i+1,j].pion.lettre!=pionVide.lettre);
+
+					do {
+						constructMot = grille[s-1,j].pion.lettre + constructMot;
+						s--;
+					} while (grille[s-1,j].pion.lettre!=pionVide.lettre);
+
+					Console.WriteLine ("---------------------------------------------------");
+					Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+					Console.WriteLine ("---------------------------------------------------");
+					Console.ReadLine ();
+					return constructMot;
+
+				}
+				if (((grille[i+1,j].pion.lettre !=pionVide.lettre)&&(!(grille[i-1,j].pion.lettre !=pionVide.lettre)))) {
+
+					constructMot += grille [i, j].pion.lettre;
+
+					do {
+						constructMot += grille[i+1,j].pion.lettre;
+						i++;
+					} while (grille[i+1,j].pion.lettre!=pionVide.lettre);
+
+					Console.WriteLine ("---------------------------------------------------");
+					Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+					Console.WriteLine ("---------------------------------------------------");
+					Console.ReadLine ();
+					return constructMot;
+
+				}
+
+				if (((!(grille [i, j + 1].pion.lettre != pionVide.lettre)) && (grille [i, j - 1].pion.lettre != pionVide.lettre))) {
+
+					constructMot += grille [i, j].pion.lettre;
+					do {
+						constructMot = grille[s-1,j].pion.lettre + constructMot;
+						s--;
+					} while (grille[s-1,j].pion.lettre!=pionVide.lettre);
+
+					Console.WriteLine ("---------------------------------------------------");
+					Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+					Console.WriteLine ("---------------------------------------------------");
+					Console.ReadLine ();
+					return constructMot;
+
+
+				}
+
+				return constructMot;
+
+			}
+
+			//Sinon c'est qu'il n'y a qu'un seule lettre 
+			else {
+
+				//On ajoute la lettre courante et on la renvoie 
+				constructMot += grille [i, j].pion.lettre;
+				Console.WriteLine ("---------------------------------------------------");
+				Console.WriteLine ("Vous avec demandé à placer : "+constructMot);
+				Console.WriteLine ("---------------------------------------------------");
+				Console.ReadLine ();
+				return constructMot;
+			}
+
+
+			
+		}
+
+
+		public static void jouer(Case[,] grille, Joueur[] tab_joueurs, int nbJoueurs, Joueur[] tab_joueursTMP, ref Pion[] sac, ref int pionRestant ) {
+
+			string esc = "";
+
+			bool partieFinie = false; 
+			bool tourFini;
+
+
+
+			//Création d'un tableau de joueur temporaire (pour avoir un chevalet temporaire) 
+			for (int z = 0; z < nbJoueurs; z++) {
+				tab_joueursTMP [z] = tab_joueurs [z]; 
+			}
+
+			do {
+
+
+				for (int i = 0; i < nbJoueurs; i++) {
+					// Création d'un grille temporaire à chaque tour
+					Case[,] grilleTMP = new Case[15, 15];
+
+					//Copie de la grille courante dans las grille temporaire 
+					for (int r = 0; r < 15; r++) {
+						for (int t = 0; t < 15; t++) {
+
+							grilleTMP [r, t] = grille [r, t];
+
+						}
+					}
+
+
+					tourFini = false;
+					string motCourant = "";
+
+					do  {
+
+						//Coordonnées (i,j) de la première lettre posée par le joueur, 
+						//initialisées à -1 pour éviter les confusions.
+						int Initiali= -1;
+						int  Initialj = -1;
+						//Compteur pour déterminer si la lettre posée par le joueur est la première lettre de tour qu'il pose ou non
+						int cpt = 0;
+
+
+						do {
+
+							selecGrille (selecChevalet (tab_joueursTMP [i].chevalet, grilleTMP), tab_joueursTMP [i].chevalet, grilleTMP, ref  Initiali, ref Initialj, ref cpt);
+
+
+							Console.WriteLine ("\n \n "+tab_joueurs[i].Nom +", voulez vous terminer votre tour ? o/n  ");
+
+							esc = Console.ReadLine ();
+
+
+
+						} while (esc != "o");
+
+						Pion pionVide;
+
+						pionVide.lettre = ' ';
+						pionVide.valeur = 0;
+
+						motCourant= motPose (grilleTMP, Initiali, Initialj, pionVide);
+
+						tourFini =true;
+
+					}while (!tourFini);
+
+	
+
+					bool motValide = false;
+					//On initialise le dictionnaire 
+					int nbrMot = NbrMotsDictionnaire();
+					string [] dico = Initdico(nbrMot);
+					//On vérifie le mot courant dans le dictionnaire 
+					motValide = dicothomie(dico, motCourant);
+
+					if (motValide) {
+
+						for (int a = 0; a < 7; a++) {
+							if (!(tab_joueursTMP [i].chevalet[a].disponible)) {
+
+								tab_joueursTMP[i].chevalet [a].pion = piocher (sac, ref pionRestant);
+
+
+							} 
+							tab_joueursTMP [i].chevalet[a].disponible = true;
+
+						}
+
+						//Si le mot est valide, 
+						//la grilleTMP devient la grille courante 
+						for (int f = 0; f < 15; f++) {
+							for (int d = 0; d< 15; d++) {
+								grille [f, d] = grilleTMP [f, d];
+							}
+						} 
+
+
+					}
+					else {
+						string changer="";
+						Console.WriteLine ("Le mot  que vous vouliez poser n'est pas valide");
+						Console.WriteLine ("Voulez vous changer vos lettres ? o/n");
+						changer = Console.ReadLine();
+
+						if (changer=="o") {
+
+
+							// Redonne 7 nouvelles lettres du sac au joueur
+							for (int a = 0; a < 7; a++) {
+
+							
+								tab_joueursTMP[i].chevalet [a].pion = piocher (sac, ref pionRestant);
+
+
+							}
+								
+						}
+
+						//Si le mot n'est pas valide, le joueur récupère les lettres qu'il a voulu poser si il n'a pas voulu les changer
+						for (int z = 0; z < 7; z++) {
+							tab_joueursTMP [i].chevalet[z].disponible = true;
+						}
+							
+					}
+				
+
+					// Le chevalet temporaire devient le chevalet courant
+					for (int q = 0; q < nbJoueurs; q++) {
+
+						tab_joueurs [q] = tab_joueursTMP [q];
+						 
+					}
+
+					 
+					// /!\ Fin de partie si aucun joueur n'a de pion dans son chevalet 
+
+					partieFinie = finDePartie ( tab_joueurs, nbJoueurs);
+
+
+
+				}
+
+			} while (!partieFinie);
+
+			Console.WriteLine ("Fin de la partie.");
+
+	  
+		}
+
+		// Algorithme naïf de fin de partie : 
+		//la partie est terminé si plus aucun joueur n'a de pion disponible dans son chevalet 
+		public static bool finDePartie ( Joueur[] tab_joueurs, int nbJoueurs ) {
+
+			bool partieFinie = false; 
+
+			for (int i = 0; i < nbJoueurs; i++) {
+
+				for (int j = 0; j < 7; j++) {
+					if (!(tab_joueurs [i].chevalet[j].disponible)) {
+						partieFinie = true;
+					} else {
+						return partieFinie = false;
+					}
+				}
+				
+			}
+
+			return partieFinie;
+		}
+
+		//Initialise le nombre de joueur, leurs nombre de point et leurs chevalets respectifs. 
+		public static void initialisationJoueur (int nbJoueur, ref Pion[] sac, ref int pionRestant, Joueur[] tab_joueurs) {
+
+
+			for (int i = 0; i < nbJoueur; i++) {
+
+				Console.WriteLine ("Nom joueur n° {0}  ?", i+1);
+				tab_joueurs[i].Nom = Console.ReadLine ();
+
+			}
+
+
+			Console.Write ("\n");
+			Console.WriteLine ("Il y a donc {0} joueurs : ", nbJoueur);
+
+			for (int g = 0; g < nbJoueur; g++) {
+
+				Console.WriteLine (tab_joueurs[g].Nom); // On affiche pour chaque joueur son nom
+				tab_joueurs [g].point = 0; // Son nombre de points
+				tab_joueurs [g].chevalet = new Case [7];  // Et on crèe un tableau de char de 7 cases qui contiendra ses lettre tout au cours de la partie 
+				initChevalet (tab_joueurs [g].chevalet, sac, ref pionRestant); // On initialise sa main
+
+
+			}
+
+			Console.Write ("\n");
+			intro ();
+			Console.WriteLine ("Appuyez sur ENTRER pour commencer à joueur");
+
+
+
+		}
+
+		//Règles du jeux
+		public static void intro () {
+			Console.WriteLine ("Ce programme est un support de jeu de Scrabble, il est à l'appréciation des joueurs de respecter les règles classiques du jeu.");
+			Console.WriteLine ("Voulez-vous afficher les règles ? Oui/Non ");
+			string res = Console.ReadLine ();
+
+			if (res=="Oui") {
+				Console.WriteLine (" Le Scrabble est un jeu de société, qui consiste à former des mots entrecroisés sur \nune grille avec des lettres de valeurs différentes. Sur cette grille, certaines cases \nsont de couleur. Elles permettent de multiplier la valeur des lettres ou des mots. \nPour commencer, chaque joueur va tirer au hasard 7 lettres. Avec celles-ci, chacun \nd’eux va alors essayer de créer un ou plusieurs mots. Le premier joueur doit obligatoirement poser le premier mot au centre du plateau, sur l’étoile. Ce mot doit être au minimum composé de 2 lettres. Le deuxième joueur doit s’appuyer sur ce mot pour placer le sien et ainsi de suite");
+				Console.WriteLine (" \nAppuyez sur ENTRER pour commencer à joueur");
+				Console.ReadLine ();
+			}
+
+		}
+
+
+		public static void Main (string[] args)
+		{	
+			Pion[] sac = new Pion[102]; // declaration du sac
+			int pionRestant = 102; //nombre pions restant dans le sac
+			int nbJoueurs = 0; // Nombre de joueurs de la partie
+			Case[,] grille = new Case[15, 15]; //declaration de la gille de jeu
+
+			initSac (sac);
+			initGrille (grille);
+
+			do
+			{
+				Console.WriteLine("Combien de joueurs pour cette partie de Scrabble ? :-) ");
+
+			} while (!int.TryParse(Console.ReadLine(), out nbJoueurs));
+
+			Joueur[] tab_joueurs = new Joueur[nbJoueurs];
+			Joueur[] tab_joueursTMP = new Joueur[nbJoueurs];
+
+			//Initialisation des joueurs
+			initialisationJoueur (nbJoueurs ,ref sac, ref pionRestant,   tab_joueurs);
+
+		
+
+			//Jeux
+			jouer (grille, tab_joueurs, nbJoueurs, tab_joueursTMP, ref sac, ref pionRestant);
+
+
+
+		}
+
+	}
+
+}
