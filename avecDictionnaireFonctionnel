@@ -1,4 +1,7 @@
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.IO; // pour lire les fichiers 
 
 
@@ -638,32 +641,45 @@ namespace scrabble
 			constructMot += grille[i, j].pion.lettre;
 
 
-			if (grille[i + 1, j].pion.lettre != pionVide.lettre)
-			{
+			if (grille [i + 1, j].pion.lettre != pionVide.lettre) {
 
-				do
-				{
-					constructMot += grille[i+1, j].pion.lettre;
+				do {
+					constructMot += grille [i + 1, j].pion.lettre;
 					i++;
 
-				} while (grille[i +1, j].pion.lettre != pionVide.lettre);
+				} while (grille [i + 1, j].pion.lettre != pionVide.lettre);
 
 
 				return constructMot;
-			}
-
-			else if (grille[i , j+1].pion.lettre != pionVide.lettre)
-			{
-				do
-				{
-					constructMot += grille[i, j+1].pion.lettre;
+			} else if (grille [i, j + 1].pion.lettre != pionVide.lettre) {
+				do {
+					constructMot += grille [i, j + 1].pion.lettre;
 					j++;
 
-				} while (grille[i, j+1].pion.lettre != pionVide.lettre);
+				} while (grille [i, j + 1].pion.lettre != pionVide.lettre);
 
 
 				return constructMot;
 
+			} else if (grille [i - 1, j].pion.lettre != pionVide.lettre) {
+				do {
+
+					constructMot = grille [i, j + 1].pion.lettre + constructMot;
+					i++;
+
+				} while (grille [i-1, j].pion.lettre != pionVide.lettre);
+			
+				return constructMot;
+			}
+			else if (grille [i , j-1].pion.lettre != pionVide.lettre) {
+				do {
+
+					constructMot = grille [i, j -1].pion.lettre + constructMot;
+					i++;
+
+				} while (grille [i, j-1].pion.lettre != pionVide.lettre);
+
+				return constructMot;
 			}
 
 			else {
