@@ -1,4 +1,7 @@
 
+using System.IO; // pour lire les fichiers 
+
+
 namespace scrabble
 {
 	class MainClass
@@ -212,8 +215,17 @@ namespace scrabble
 
 		//Pioche un pion dans le sac : prend la dernière valeur du tableau de Case sac
 		public static Pion piocher(Pion[] sac,ref int pionRestant) {
-			pionRestant--;
-			return sac [pionRestant];
+
+			if (pionRestant==0) {
+				Pion pionVide;
+				pionVide.lettre = ' ';
+				pionVide.valeur = 0;
+				return pionVide;
+			} else {
+				pionRestant--;
+				return sac [pionRestant];
+			}
+
 		}
 
 
@@ -371,13 +383,9 @@ namespace scrabble
 
 		public static void selecGrille(Pion pion, Case[] chevalet, Case[,] grille, ref int Initiali, ref int Initialj, ref int cpt) {
 			ConsoleKeyInfo saisie;
+			//Placement initial sur la grille
 			int i = 7;
 			int j = 7;
-			 
-
-	
-
-			 //compteur pour compter le nombre de lettre que le joueur à posé sur la grille 
 
 			do {
 				grille [i,j].selectionee = true;
@@ -434,6 +442,7 @@ namespace scrabble
 
 		}
 
+		//Initialise le chevalet d'un joueur 
 		public static void initChevalet(Case[] chevalet, Pion[] sac, ref int pionRestant) {
 			int i;
 			for (i = 0; i < 7; i++) {
@@ -443,7 +452,8 @@ namespace scrabble
 			}
 
 		}
-		public static void affChevalet(Case[] chevalet) { // ça devrait etre la main temporaire 
+
+		public static void affChevalet(Case[] chevalet) { 
 			int i;
 
 			Console.Write ("\n Votre main est  :\n");
@@ -539,22 +549,7 @@ namespace scrabble
 
 		}
 
-		//Pour vérifier si le premier mot posé est bien sur le centre de la grille 
-		public static bool verifierPositionPremierTour(int Initiali, int Initialj) {
-			bool res = true;
-
-			if (Initiali==7) {
-				return res;
-			}
-			if (Initialj==7) {
-				return res;
-			} else {
-				return !res;
-			}
-
-
-		}
-
+	
 		// fonction qui calcule le nombre de mots du Dictionnaire parent du  dossier //
 		public static int NbrMotsDictionnaire()
 		{
@@ -701,10 +696,10 @@ namespace scrabble
 
 
 				for (int i = 0; i < nbJoueurs; i++) {
-
+					// Création d'un grille temporaire à chaque tour
 					Case[,] grilleTMP = new Case[15, 15];
 
-
+					//Copie de la grille courante dans las grille temporaire 
 					for (int r = 0; r < 15; r++) {
 						for (int t = 0; t < 15; t++) {
 
@@ -719,7 +714,8 @@ namespace scrabble
 
 					do  {
 
-						//Coordonnées (i,j) de la première lettre posée par le joueur
+						//Coordonnées (i,j) de la première lettre posée par le joueur, 
+						//initialisées à -1 pour éviter les confusions.
 						int Initiali= -1;
 						int  Initialj = -1;
 						//Compteur pour déterminer si la lettre posée par le joueur est la première lettre de tour qu'il pose ou non
@@ -750,16 +746,13 @@ namespace scrabble
 
 					}while (!tourFini);
 
-					//Ici la fonction pour concatener le mot qu'il est entrain de poser 
-
-
-
+	
 
 					bool motValide = false;
 					//On initialise le dictionnaire 
 					int nbrMot = NbrMotsDictionnaire();
 					string [] dico = Initdico(nbrMot);
-
+					//On vérifie le mot courant dans le dictionnaire 
 					motValide = dicothomie(dico, motCourant);
 
 					if (motValide) {
@@ -775,6 +768,7 @@ namespace scrabble
 
 						}
 
+						//Si le mot est valide, 
 						//la grilleTMP devient la grille courante 
 						for (int f = 0; f < 15; f++) {
 							for (int d = 0; d< 15; d++) {
@@ -785,6 +779,7 @@ namespace scrabble
 
 					}
 
+					//Si le mot n'est pas valide, le joueur récupère les lettres qu'il a voulu poser
 					for (int z = 0; z < 7; z++) {
 						tab_joueursTMP [i].chevalet[z].disponible = true;
 					}
@@ -797,12 +792,11 @@ namespace scrabble
 						 
 					}
 
-					//Si fin de parti  : 
-					///!\ Fin de partie si aucun joueur n'a de pion dans son chevalet 
+					 
+					// /!\ Fin de partie si aucun joueur n'a de pion dans son chevalet 
 
-					if (pionRestant==0){ // à adapter 
-						partieFinie =true;
-					}
+					partieFinie = finDePartie ( tab_joueurs, nbJoueurs);
+
 
 
 				}
@@ -810,11 +804,32 @@ namespace scrabble
 			} while (!partieFinie);
 
 			Console.WriteLine ("Fin de la partie.");
-			//Calculer vainqueur
-			Console.WriteLine ("Le grand vainqueur est : ");
+
 	  
 		}
 
+		// Algorithme naïf de fin de partie : 
+		//la partie est terminé si plus aucun joueur n'a de pion disponible dans son chevalet 
+		public static bool finDePartie ( Joueur[] tab_joueurs, int nbJoueurs ) {
+
+			bool partieFinie = false; 
+
+			for (int i = 0; i < nbJoueurs; i++) {
+
+				for (int j = 0; j < 7; j++) {
+					if (!(tab_joueurs [i].chevalet[j].disponible)) {
+						partieFinie = true;
+					} else {
+						return partieFinie = false;
+					}
+				}
+				
+			}
+
+			return partieFinie;
+		}
+
+		//Initialise le nombre de joueur, leurs nombre de point et leurs chevalets respectifs. 
 		public static void initialisationJoueur (int nbJoueur, ref Pion[] sac, ref int pionRestant, Joueur[] tab_joueurs) {
 
 
@@ -847,14 +862,15 @@ namespace scrabble
 
 		}
 
+		//Règles du jeux
 		public static void intro () {
 			Console.WriteLine ("Ce programme est un support de jeu de Scrabble, il est à l'appréciation des joueurs de respecter les règles classiques du jeu.");
 			Console.WriteLine ("Voulez-vous afficher les règles ? Oui/Non ");
 			string res = Console.ReadLine ();
 
 			if (res=="Oui") {
-				Console.WriteLine ("Les règles classiques du Scrabbles sont : ");
-				Console.WriteLine ("Appuyez sur ENTRER pour commencer à joueur");
+				Console.WriteLine (" Le Scrabble est un jeu de société, qui consiste à former des mots entrecroisés sur \nune grille avec des lettres de valeurs différentes. Sur cette grille, certaines cases \nsont de couleur. Elles permettent de multiplier la valeur des lettres ou des mots. \nPour commencer, chaque joueur va tirer au hasard 7 lettres. Avec celles-ci, chacun \nd’eux va alors essayer de créer un ou plusieurs mots. Le premier joueur doit obligatoirement poser le premier mot au centre du plateau, sur l’étoile. Ce mot doit être au minimum composé de 2 lettres. Le deuxième joueur doit s’appuyer sur ce mot pour placer le sien et ainsi de suite");
+				Console.WriteLine (" \nAppuyez sur ENTRER pour commencer à joueur");
 				Console.ReadLine ();
 			}
 
@@ -880,6 +896,7 @@ namespace scrabble
 			Joueur[] tab_joueurs = new Joueur[nbJoueurs];
 			Joueur[] tab_joueursTMP = new Joueur[nbJoueurs];
 
+			//Initialisation des joueurs
 			initialisationJoueur (nbJoueurs ,ref sac, ref pionRestant,   tab_joueurs);
 
 		
