@@ -397,7 +397,7 @@ namespace scrabble
 				if (saisie.Key == ConsoleKey.UpArrow) {
 					grille[i,j].selectionee = false;
 					i--;
-					if (i < 0) {
+					if (i < 0) { // Pour ne pas sortir de la grille 
 						i = 0;
 					}
 
@@ -405,14 +405,14 @@ namespace scrabble
 				if (saisie.Key == ConsoleKey.DownArrow) {
 					grille[i,j].selectionee = false;
 					i++;
-					if (i >= 15) {
+					if (i >= 15) { // Pour ne pas sortir de la grille 
 						i = 14;
 					}
 				}
 				if (saisie.Key == ConsoleKey.LeftArrow) {
 					grille[i,j].selectionee = false;
 					j--;
-					if (j < 0) {
+					if (j < 0) { // Pour ne pas sortir de la grille 
 						j = 0;
 					}
 
@@ -420,7 +420,7 @@ namespace scrabble
 				if (saisie.Key == ConsoleKey.RightArrow) {
 					grille[i,j].selectionee = false;
 					j++;
-					if (j >= 15) {
+					if (j >= 15) { // Pour ne pas sortir de la grille 
 						j = 14;
 					}
 				}
@@ -512,7 +512,7 @@ namespace scrabble
 
 						i--;
 
-						if (i < 0) {
+					if (i < 0) { // Pour ne pas sortir du chevalet 
 							i = 0;
 							}
 
@@ -523,7 +523,7 @@ namespace scrabble
 
 						i++;
 
-						if (i >= 7) {
+					if (i >= 7) { // Pour ne pas sortir du chevalet 
 							i = 6;
 						}
 
@@ -531,7 +531,7 @@ namespace scrabble
 			} while (saisie.Key != ConsoleKey.Enter);
 
 
-			chevalet [i].disponible = false;
+			chevalet [i].disponible = false; // Pour griser les cases qui ne sont plus disponibles
 			chevalet [i].selectionee = false;
 
 
@@ -572,7 +572,7 @@ namespace scrabble
 		}
 
 
-		// fonction qui remplit un tableau contenant tout les mot du fichier texte dictionnaire //
+		// fonction qui remplit un tableau contenant tout les mot du fichier texte dictionnaire 
 		public static string[] Initdico (int nbrMot)
 		{
 			StreamReader monStreamReader = new StreamReader("dico_fr_sans_accent.txt");
@@ -640,7 +640,7 @@ namespace scrabble
 			string constructMot ="";
 			constructMot += grille[i, j].pion.lettre;
 
-
+			//Si le mot est placé horizontalement
 			if (grille [i + 1, j].pion.lettre != pionVide.lettre) {
 
 				do {
@@ -651,17 +651,23 @@ namespace scrabble
 
 
 				return constructMot;
-			} else if (grille [i, j + 1].pion.lettre != pionVide.lettre) {
+			}
+			//Si le mot est placé verticalement
+			 else if (grille [i, j + 1].pion.lettre != pionVide.lettre) {
+
+
 				do {
 					constructMot += grille [i, j + 1].pion.lettre;
 					j++;
 
-				} while (grille [i, j + 1].pion.lettre != pionVide.lettre);
+				} while (grille [i, j+1 ].pion.lettre != pionVide.lettre);
 
 
 				return constructMot;
 
-			} else if (grille [i - 1, j].pion.lettre != pionVide.lettre) {
+			} 
+			//Si le joueur complète un mot horizontal
+			else if (grille [i - 1, j].pion.lettre != pionVide.lettre) {
 				do {
 
 					constructMot = grille [i, j + 1].pion.lettre + constructMot;
@@ -671,6 +677,7 @@ namespace scrabble
 			
 				return constructMot;
 			}
+			// Si le joueur complète un mot vertical 
 			else if (grille [i , j-1].pion.lettre != pionVide.lettre) {
 				do {
 
@@ -681,7 +688,7 @@ namespace scrabble
 
 				return constructMot;
 			}
-
+			//Si le joueur ne place qu'une lettre au premier tour  ("A" est dans le dictionnaire par exemple)
 			else {
 				return constructMot;	
 			}
@@ -698,9 +705,6 @@ namespace scrabble
 			bool partieFinie = false; 
 			bool tourFini;
 
-			 
-			//Création de la grille temporaire, le temps de savoir si
-			// le mot est valide ou non, si il est légalement placable sur la grille ou non. 
 
 
 			//Création d'un tableau de joueur temporaire (pour avoir un chevalet temporaire) 
@@ -917,7 +921,7 @@ namespace scrabble
 
 		
 
-
+			//Jeux
 			jouer (grille, tab_joueurs, nbJoueurs, tab_joueursTMP, ref sac, ref pionRestant);
 
 
