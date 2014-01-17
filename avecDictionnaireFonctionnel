@@ -650,7 +650,7 @@ namespace scrabble
 				} while (grille [i + 1, j].pion.lettre != pionVide.lettre);
 
 
-				return constructMot;
+				
 			}
 			//Si le mot est placé verticalement
 			 else if (grille [i, j + 1].pion.lettre != pionVide.lettre) {
@@ -663,7 +663,7 @@ namespace scrabble
 				} while (grille [i, j+1 ].pion.lettre != pionVide.lettre);
 
 
-				return constructMot;
+				
 
 			} 
 			//Si le joueur complète un mot horizontal
@@ -675,7 +675,7 @@ namespace scrabble
 
 				} while (grille [i-1, j].pion.lettre != pionVide.lettre);
 			
-				return constructMot;
+				
 			}
 			// Si le joueur complète un mot vertical 
 			else if (grille [i , j-1].pion.lettre != pionVide.lettre) {
@@ -686,12 +686,14 @@ namespace scrabble
 
 				} while (grille [i, j-1].pion.lettre != pionVide.lettre);
 
-				return constructMot;
+				
 			}
 			//Si le joueur ne place qu'une lettre au premier tour  ("A" est dans le dictionnaire par exemple)
 			else {
 				return constructMot;	
 			}
+			
+			return constructMot;
 
 		}
 
